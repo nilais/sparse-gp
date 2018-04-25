@@ -21,6 +21,24 @@ class GaussianProcess():
         mp.pylab.show(block=True)
 
 
+class SparseGaussianProcess():
+
+    def __init__(self, kernel=None):
+        if kernel is None:
+            kernel = gp.kern.RBF(1)
+        self.kernel = kernel
+
+    def fit(self, data):
+        n = data.n
+        X, y = data.x, data.y
+        # here, Z are the inducing points
+        z = np.random.rand(12,1)*12
+        self.gp = gp.models.SparseGPRegression(X,y,Z=z)
+        self.gp.optimize('bfgs')
+
+    def plot(self):
+        self.gp.plot()
+        mp.pylab.show(block=True)
 
 class Dataset():
 
@@ -29,9 +47,15 @@ class Dataset():
         k = gp.kern.RBF(1)
         self.n = N
         self.x = np.linspace(0,10,N)[:,None]
+        print(self.x.shape)
         self.y = np.random.multivariate_normal(np.zeros(N),k.K(self.x)+np.eye(N)*np.sqrt(noise_var)).reshape(-1,1)
-
+        print(self.y.shape)
+        err = (np.random.randn(N)*noise_var).reshape(-1,1)
+        self.y = np.sin(self.x + err).reshape(-1,1)
 d = Dataset(50)
 g = GaussianProcess()
+s = SparseGaussianProcess()
 g.fit(d)
+s.fit(d)
 g.plot()
+s.plot()
