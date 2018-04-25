@@ -34,6 +34,7 @@ class SparseGaussianProcess():
         # here, Z are the inducing points
         z = np.random.rand(12,1)*12
         self.gp = gp.models.SparseGPRegression(X,y,Z=z)
+        self.gp.inference_method=gp.inference.latent_function_inference.FITC()
         self.gp.optimize('bfgs')
 
     def plot(self):
